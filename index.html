@@ -1385,12 +1385,12 @@
             // 生成滚轮项目
             generatePickerItems();
 
-            // 确保滚轮重置到初始位置
+            // 确保滚轮重置到初始位置：让第一个城市出现在中间位置
             const cities = currentRecommendedCities;
             const itemHeight = 40;
             const visibleItems = 5;
             const centerOffset = (visibleItems - 1) / 2 * itemHeight;
-            const initialPosition = cities.length * itemHeight + centerOffset;
+            const initialPosition = centerOffset;
             pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
             pickerWheel.dataset.initialPosition = initialPosition;
 
@@ -1437,11 +1437,11 @@
                 pickerWheel.appendChild(item);
             });
 
-            // 设置初始位置到中间（从第一个完整循环开始）
-            // 确保初始位置是固定的，避免每次重置位置不一致
-            const initialPosition = cities.length * itemHeight + centerOffset;
+            // 设置初始位置：让第一个城市出现在中间位置
+            // 第一个城市在滚轮中的Y坐标是 0，要让它出现在中间位置（centerOffset），需要滚动到 -centerOffset
+            const initialPosition = centerOffset;
             pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
-
+            
             // 存储初始位置，用于后续计算
             pickerWheel.dataset.initialPosition = initialPosition;
         }
@@ -1463,33 +1463,31 @@
             const cities = currentRecommendedCities;
             const itemHeight = 40;
             const visibleItems = 5;
-            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移量
+            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移量 = 80px
 
             // 随机选择结果
             const randomIndex = Math.floor(Math.random() * cities.length);
             const selectedCity = cities[randomIndex];
 
-            // 获取当前滚轮位置
-            const currentTransform = pickerWheel.style.transform;
-            const currentPosition = currentTransform ?
-                parseFloat(currentTransform.match(/-?[\d.]+/)?.[0] || 0) :
-                parseFloat(pickerWheel.dataset.initialPosition || 0);
-
-            // 计算目标位置
-            // 目标：让选中的城市出现在中间位置
-            // 需要滚动到：初始位置 + 多圈滚动 + 目标城市位置
+            // 关键修复：正确计算目标位置
+            // 箭头指向中间位置，中间位置在滚轮中的Y坐标是 centerOffset (80px)
+            // 要让第randomIndex个城市出现在中间位置，该城市在滚轮中的Y坐标应该是 centerOffset
+            // 所以需要滚动到：randomIndex * itemHeight - centerOffset
+            
+            // 添加多圈滚动效果
             const baseScroll = cities.length * itemHeight * (5 + Math.random() * 3); // 5-8圈
-            const targetCityPosition = randomIndex * itemHeight;
-            const finalScroll = currentPosition + baseScroll + targetCityPosition;
+            const targetPosition = randomIndex * itemHeight - centerOffset;
+            const finalScroll = baseScroll + targetPosition;
 
             console.log('抽奖调试信息:', {
                 randomIndex,
                 selectedCity: selectedCity.name,
-                currentPosition,
+                centerOffset,
+                targetPosition,
                 baseScroll,
-                targetCityPosition,
                 finalScroll,
-                centerOffset
+                '城市在滚轮中的Y坐标': randomIndex * itemHeight,
+                '箭头指向的Y坐标': centerOffset
             });
 
             // 应用滚动
