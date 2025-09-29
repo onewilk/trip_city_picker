@@ -15,29 +15,12 @@ done
 
 echo "✅ 所有必要文件检查完成"
 
-# 更新省份数据
-echo "🔄 更新省份数据..."
-if [ -f "extract_provinces.py" ]; then
-    python3 extract_provinces.py
-    if [ $? -eq 0 ]; then
-        echo "✅ 省份数据更新完成"
-    else
-        echo "⚠️  省份数据更新失败，但继续部署"
-    fi
-else
-    echo "⚠️  未找到 extract_provinces.py，跳过省份数据更新"
-fi
 
 # 创建部署包
 echo "📦 创建部署包..."
 mkdir -p deploy
 cp server.py index.html cities_data.json requirements.txt Procfile railway.json deploy/
 
-# 如果省份数据文件存在，也复制到部署目录
-if [ -f "provinces_data.json" ]; then
-    cp provinces_data.json deploy/
-    echo "✅ 已包含省份数据文件"
-fi
 
 echo "✅ 部署包创建完成"
 echo "📁 部署文件位于 deploy/ 目录"
