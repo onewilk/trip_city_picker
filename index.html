@@ -47,9 +47,7 @@
         }
 
         .control-panel {
-            padding: 40px;
-            text-align: center;
-            background: #f8f9fa;
+            display: none; /* 隐藏空的控制面板 */
         }
 
         .control-panel .input-group {
@@ -134,6 +132,56 @@
 
         .btn-filter:hover {
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        /* 固定底部按钮区域 */
+        .fixed-bottom-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .btn-recommend {
+            flex: 3;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-recommend:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-filter {
+            flex: 1;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            position: relative;
+        }
+
+        .btn-filter:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-icon {
+            display: none;
+        }
+
+        /* 响应式设计：小屏幕时隐藏筛选按钮文本 */
+        @media (max-width: 480px) {
+            .btn-filter .btn-text {
+                display: none;
+            }
+            
+            .btn-filter .btn-icon {
+                display: inline;
+            }
         }
 
         .btn:active {
@@ -619,7 +667,7 @@
 
         /* 为页面内容添加底部间距，避免被固定按钮遮挡 */
         .container {
-            padding-bottom: 100px;
+            padding-bottom: 120px;
         }
 
         /* 弹窗样式 */
@@ -1024,16 +1072,12 @@
         </div>
 
         <div class="control-panel">
-            <div class="input-group">
-                <button class="btn btn-full" onclick="getRandomCities()">🎲 随机推荐</button>
-                <button class="btn btn-filter" onclick="openFilterModal()">⚙️ 筛选选项</button>
-            </div>
+            <!-- 控制面板内容已移到筛选弹窗中 -->
         </div>
 
         <div class="results" id="results">
             <div class="no-results">
                 <h3>🎯 准备开始您的旅行计划</h3>
-                <p>点击"随机推荐"按钮开始探索，或点击"筛选选项"进行个性化设置</p>
             </div>
         </div>
 
@@ -1043,6 +1087,17 @@
                 🎲 选择困难点我
             </button>
         </div>
+    </div>
+
+    <!-- 固定底部按钮区域 -->
+    <div class="fixed-bottom-buttons">
+        <button class="btn btn-recommend" onclick="getRandomCities()">
+            <span class="btn-text">🎲 随机推荐</span>
+        </button>
+        <button class="btn btn-filter" onclick="openFilterModal()">
+            <span class="btn-text">⚙️ 筛选选项</span>
+            <span class="btn-icon">⚙️</span>
+        </button>
     </div>
 
     <!-- 筛选选项弹窗 -->
