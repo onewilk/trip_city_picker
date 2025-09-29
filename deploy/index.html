@@ -1017,9 +1017,9 @@
         let isWheelSpinning = false;
 
         // API配置
-        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:8000' 
-            : 'https://your-app.railway.app'; // 请替换为您的实际Railway URL
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8000'
+            : 'https://web-production-9cc1d.up.railway.app'; // 请替换为您的实际Railway URL
 
         // 加载城市数据
         async function loadCitiesData() {
@@ -1036,7 +1036,7 @@
                 } catch (apiError) {
                     console.log('后端API不可用，使用本地数据:', apiError);
                 }
-                
+
                 // 如果API不可用，回退到本地文件
                 const response = await fetch('cities_data.json');
                 citiesData = await response.json();
@@ -1112,11 +1112,16 @@
         }
 
         // 随机获取城市
-        async function getRandomCities() {
+        function getRandomCities() {
             const cityCount = parseInt(document.getElementById('cityCount').value);
 
             if (!cityCount || cityCount < 1 || cityCount > 100) {
                 alert('请输入1-100之间的数字');
+                return;
+            }
+
+            if (citiesData.length === 0) {
+                showError('城市数据尚未加载完成，请稍后再试');
                 return;
             }
 
@@ -1125,74 +1130,38 @@
             const sameProvinceMode = document.querySelector('input[name="sameProvince"]:checked').value;
             const showWeather = document.getElementById('weatherToggle').checked;
 
+            // 根据省份筛选城市
+            let filteredCities = citiesData;
+            if (selectedProvinces.length > 0) {
+                filteredCities = citiesData.filter(city => selectedProvinces.includes(city.province));
+            }
+
+            if (filteredCities.length === 0) {
+                alert('所选省份中没有城市数据，请重新选择省份');
+                return;
+            }
+
+            if (cityCount > filteredCities.length) {
+                alert(`所选省份中最多只能选择 ${filteredCities.length} 个城市`);
+                return;
+            }
+
             showLoading();
 
-            try {
-                // 优先尝试使用后端API
-                try {
-                    const params = new URLSearchParams({
-                        count: cityCount,
-                        provinces: selectedProvinces.join(','),
-                        same_province: sameProvinceMode
-                    });
-                    
-                    const response = await fetch(`${API_BASE_URL}/api/random-cities?${params}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        const randomCities = data.cities || data;
-                        console.log('从后端API获取城市数据:', randomCities);
-                        
-                        // 模拟加载延迟，提供更好的用户体验
-                        setTimeout(() => {
-                            displayResults(randomCities, showWeather);
-                        }, 800);
-                        return;
-                    }
-                } catch (apiError) {
-                    console.log('后端API不可用，使用前端逻辑:', apiError);
+            // 模拟加载延迟，提供更好的用户体验
+            setTimeout(() => {
+                let randomCities;
+
+                if (sameProvinceMode === 'prevent') {
+                    // 避免同省多个城市
+                    randomCities = getRandomCitiesFromDifferentProvinces(filteredCities, cityCount);
+                } else {
+                    // 允许同省多个城市
+                    randomCities = getRandomElements(filteredCities, cityCount);
                 }
 
-                // 如果API不可用，使用前端逻辑
-                if (citiesData.length === 0) {
-                    showError('城市数据尚未加载完成，请稍后再试');
-                    return;
-                }
-
-                // 根据省份筛选城市
-                let filteredCities = citiesData;
-                if (selectedProvinces.length > 0) {
-                    filteredCities = citiesData.filter(city => selectedProvinces.includes(city.province));
-                }
-
-                if (filteredCities.length === 0) {
-                    alert('所选省份中没有城市数据，请重新选择省份');
-                    return;
-                }
-
-                if (cityCount > filteredCities.length) {
-                    alert(`所选省份中最多只能选择 ${filteredCities.length} 个城市`);
-                    return;
-                }
-
-                // 模拟加载延迟，提供更好的用户体验
-                setTimeout(() => {
-                    let randomCities;
-
-                    if (sameProvinceMode === 'prevent') {
-                        // 避免同省多个城市
-                        randomCities = getRandomCitiesFromDifferentProvinces(filteredCities, cityCount);
-                    } else {
-                        // 允许同省多个城市
-                        randomCities = getRandomElements(filteredCities, cityCount);
-                    }
-
-                    displayResults(randomCities, showWeather);
-                }, 800);
-
-            } catch (error) {
-                console.error('获取城市数据失败:', error);
-                showError('获取城市数据失败，请稍后重试');
-            }
+                displayResults(randomCities, showWeather);
+            }, 800);
         }
 
         // 获取选中的省份
@@ -1416,6 +1385,15 @@
             // 生成滚轮项目
             generatePickerItems();
 
+            // 确保滚轮重置到初始位置
+            const cities = currentRecommendedCities;
+            const itemHeight = 40;
+            const visibleItems = 5;
+            const centerOffset = (visibleItems - 1) / 2 * itemHeight;
+            const initialPosition = cities.length * itemHeight + centerOffset;
+            pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
+            pickerWheel.dataset.initialPosition = initialPosition;
+
             // 显示弹窗
             modal.style.display = 'flex';
         }
@@ -1460,7 +1438,12 @@
             });
 
             // 设置初始位置到中间（从第一个完整循环开始）
-            pickerWheel.style.transform = `translateY(-${cities.length * itemHeight + centerOffset}px)`;
+            // 确保初始位置是固定的，避免每次重置位置不一致
+            const initialPosition = cities.length * itemHeight + centerOffset;
+            pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
+
+            // 存储初始位置，用于后续计算
+            pickerWheel.dataset.initialPosition = initialPosition;
         }
 
         // 旋转滚轮选择器
@@ -1486,20 +1469,25 @@
             const randomIndex = Math.floor(Math.random() * cities.length);
             const selectedCity = cities[randomIndex];
 
-            // 计算最终滚动位置
-            // 目标：让选中的城市出现在中间位置（第3个位置，索引2）
-            // 中间位置在滚轮中的Y坐标是：centerOffset
-            // 要让第randomIndex个城市出现在中间，需要滚动到：randomIndex * itemHeight - centerOffset
-            const targetPosition = randomIndex * itemHeight - centerOffset;
+            // 获取当前滚轮位置
+            const currentTransform = pickerWheel.style.transform;
+            const currentPosition = currentTransform ?
+                parseFloat(currentTransform.match(/-?[\d.]+/)?.[0] || 0) :
+                parseFloat(pickerWheel.dataset.initialPosition || 0);
 
-            // 添加多圈滚动效果（至少5圈）
-            const baseScroll = cities.length * itemHeight * (5 + Math.random() * 3);
-            const finalScroll = baseScroll + targetPosition;
+            // 计算目标位置
+            // 目标：让选中的城市出现在中间位置
+            // 需要滚动到：初始位置 + 多圈滚动 + 目标城市位置
+            const baseScroll = cities.length * itemHeight * (5 + Math.random() * 3); // 5-8圈
+            const targetCityPosition = randomIndex * itemHeight;
+            const finalScroll = currentPosition + baseScroll + targetCityPosition;
 
             console.log('抽奖调试信息:', {
                 randomIndex,
                 selectedCity: selectedCity.name,
-                targetPosition,
+                currentPosition,
+                baseScroll,
+                targetCityPosition,
                 finalScroll,
                 centerOffset
             });
