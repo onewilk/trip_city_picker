@@ -785,6 +785,68 @@
             text-align: center;
         }
 
+        /* 简单抽奖样式 */
+        .simple-lottery {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .lottery-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            min-height: 120px;
+        }
+
+        .lottery-arrow {
+            font-size: 2.5em;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .lottery-content {
+            text-align: center;
+            color: white;
+            min-width: 200px;
+        }
+
+        .lottery-city {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .lottery-province {
+            font-size: 1.1em;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .lottery-content.changing {
+            animation: cityChange 0.1s ease-in-out;
+        }
+
+        @keyframes cityChange {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         .spin-btn {
             background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
@@ -982,22 +1044,23 @@
     <div class="modal-overlay" id="lotteryModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🎰 滚轮抽奖 - 让命运决定您的旅行</h2>
+                <h2>🎰 随机抽奖 - 让命运决定您的旅行</h2>
                 <button class="close-btn" onclick="closeLotteryModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="lottery-container">
-                    <div class="picker-container">
-                        <div class="picker-wrapper">
-                            <div class="picker-mask"></div>
-                            <div class="picker-indicator"></div>
-                            <div class="picker-wheel" id="pickerWheel">
-                                <!-- 滚轮项目将通过JavaScript动态生成 -->
+                    <div class="simple-lottery">
+                        <div class="lottery-display">
+                            <div class="lottery-arrow">➡️</div>
+                            <div class="lottery-content" id="lotteryContent">
+                                <div class="lottery-city">?</div>
+                                <div class="lottery-province">点击开始抽奖</div>
                             </div>
+                            <div class="lottery-arrow">⬅️</div>
                         </div>
                     </div>
                     <div class="lottery-controls">
-                        <button class="spin-btn" id="spinBtn" onclick="spinPicker()">
+                        <button class="spin-btn" id="spinBtn" onclick="startSimpleLottery()">
                             🎯 开始
                         </button>
                         <div class="lottery-result" id="lotteryResult" style="display: none;">
@@ -1021,6 +1084,24 @@
             ? 'http://localhost:8000'
             : 'https://web-production-9cc1d.up.railway.app'; // 请替换为您的实际Railway URL
 
+        // 加载省份数据
+        async function loadProvincesData() {
+            try {
+                const response = await fetch('provinces_data.json');
+                allProvinces = await response.json();
+                console.log(`已加载 ${allProvinces.length} 个省份数据`);
+                generateProvinceCheckboxes();
+            } catch (error) {
+                console.error('加载省份数据失败:', error);
+                // 如果省份文件不存在，回退到从城市数据中提取
+                console.log('回退到从城市数据中提取省份...');
+                if (citiesData.length > 0) {
+                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                    generateProvinceCheckboxes();
+                }
+            }
+        }
+
         // 加载城市数据
         async function loadCitiesData() {
             try {
@@ -1031,20 +1112,21 @@
                         const data = await response.json();
                         citiesData = data.cities || data;
                         console.log(`已从后端API加载 ${citiesData.length} 个城市数据`);
+                        // 加载省份数据
+                        await loadProvincesData();
                         return;
                     }
                 } catch (apiError) {
                     console.log('后端API不可用，使用本地数据:', apiError);
                 }
-
+                
                 // 如果API不可用，回退到本地文件
                 const response = await fetch('cities_data.json');
                 citiesData = await response.json();
                 console.log(`已从本地文件加载 ${citiesData.length} 个城市数据`);
 
-                // 提取所有省份
-                allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
-                generateProvinceCheckboxes();
+                // 加载省份数据
+                await loadProvincesData();
             } catch (error) {
                 console.error('加载城市数据失败:', error);
                 showError('加载城市数据失败，请刷新页面重试');
@@ -1370,29 +1452,24 @@
             }
         }
 
-        // 打开滚轮抽奖弹窗
+        // 打开简单抽奖弹窗
         function openLotteryModal() {
             const modal = document.getElementById('lotteryModal');
-            const pickerWheel = document.getElementById('pickerWheel');
             const result = document.getElementById('lotteryResult');
             const spinBtn = document.getElementById('spinBtn');
+            const lotteryContent = document.getElementById('lotteryContent');
 
             // 重置状态
             result.style.display = 'none';
             spinBtn.disabled = false;
+            spinBtn.textContent = '🎯 开始';
             isWheelSpinning = false;
 
-            // 生成滚轮项目
-            generatePickerItems();
-
-            // 确保滚轮重置到初始位置
-            const cities = currentRecommendedCities;
-            const itemHeight = 40;
-            const visibleItems = 5;
-            const centerOffset = (visibleItems - 1) / 2 * itemHeight;
-            const initialPosition = cities.length * itemHeight + centerOffset;
-            pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
-            pickerWheel.dataset.initialPosition = initialPosition;
+            // 重置显示内容
+            lotteryContent.innerHTML = `
+                <div class="lottery-city">?</div>
+                <div class="lottery-province">点击开始抽奖</div>
+            `;
 
             // 显示弹窗
             modal.style.display = 'flex';
@@ -1404,103 +1481,72 @@
             modal.style.display = 'none';
         }
 
-        // 生成滚轮项目
-        function generatePickerItems() {
-            const pickerWheel = document.getElementById('pickerWheel');
-            pickerWheel.innerHTML = '';
-
-            const cities = currentRecommendedCities;
-            const itemHeight = 40;
-            const visibleItems = 5; // 可见项目数量
-            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移
-
-            // 为了确保循环展示无空白，创建更多重复项目
-            // 至少需要足够多的项目来支持多圈滚动
-            const repeatCount = Math.max(10, Math.ceil(1000 / cities.length)); // 确保有足够的项目
-            const extendedCities = [];
-            for (let i = 0; i < repeatCount; i++) {
-                extendedCities.push(...cities);
-            }
-
-            extendedCities.forEach((city, index) => {
-                const item = document.createElement('div');
-                item.className = 'picker-item';
-                item.style.top = `${index * itemHeight}px`;
-                item.innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.9em; font-weight: bold;">${city.name}</div>
-                        <div style="font-size: 0.7em; opacity: 0.8;">${city.province}</div>
-                    </div>
-                `;
-                item.dataset.cityIndex = index % cities.length;
-                item.dataset.cityData = JSON.stringify(city);
-                pickerWheel.appendChild(item);
-            });
-
-            // 设置初始位置到中间（从第一个完整循环开始）
-            // 确保初始位置是固定的，避免每次重置位置不一致
-            const initialPosition = cities.length * itemHeight + centerOffset;
-            pickerWheel.style.transform = `translateY(-${initialPosition}px)`;
-
-            // 存储初始位置，用于后续计算
-            pickerWheel.dataset.initialPosition = initialPosition;
-        }
-
-        // 旋转滚轮选择器
-        function spinPicker() {
+        // 简单抽奖功能
+        function startSimpleLottery() {
             if (isWheelSpinning) return;
 
-            const pickerWheel = document.getElementById('pickerWheel');
             const spinBtn = document.getElementById('spinBtn');
             const result = document.getElementById('lotteryResult');
+            const lotteryContent = document.getElementById('lotteryContent');
 
-            // 禁用按钮
+            // 禁用按钮并开始倒计时
             spinBtn.disabled = true;
             isWheelSpinning = true;
             result.style.display = 'none';
 
-            // 计算滚动参数
+            // 随机选择最终结果
             const cities = currentRecommendedCities;
-            const itemHeight = 40;
-            const visibleItems = 5;
-            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移量
-
-            // 随机选择结果
             const randomIndex = Math.floor(Math.random() * cities.length);
             const selectedCity = cities[randomIndex];
-
-            // 获取当前滚轮位置
-            const currentTransform = pickerWheel.style.transform;
-            const currentPosition = currentTransform ?
-                parseFloat(currentTransform.match(/-?[\d.]+/)?.[0] || 0) :
-                parseFloat(pickerWheel.dataset.initialPosition || 0);
-
-            // 计算目标位置
-            // 目标：让选中的城市出现在中间位置
-            // 需要滚动到：初始位置 + 多圈滚动 + 目标城市位置
-            const baseScroll = cities.length * itemHeight * (5 + Math.random() * 3); // 5-8圈
-            const targetCityPosition = randomIndex * itemHeight;
-            const finalScroll = currentPosition + baseScroll + targetCityPosition;
 
             console.log('抽奖调试信息:', {
                 randomIndex,
                 selectedCity: selectedCity.name,
-                currentPosition,
-                baseScroll,
-                targetCityPosition,
-                finalScroll,
-                centerOffset
+                totalCities: cities.length
             });
 
-            // 应用滚动
-            pickerWheel.style.transform = `translateY(-${finalScroll}px)`;
+            // 开始随机变动效果
+            let changeCount = 0;
+            const maxChanges = 30; // 3秒内变动30次，每次100ms
+            const changeInterval = setInterval(() => {
+                // 随机选择一个城市显示
+                const randomCity = cities[Math.floor(Math.random() * cities.length)];
 
-            // 等待动画完成后显示结果
-            setTimeout(() => {
-                showLotteryResult(selectedCity);
-                spinBtn.disabled = false;
-                isWheelSpinning = false;
-            }, 3000);
+                // 添加变动动画
+                lotteryContent.classList.add('changing');
+
+                // 更新显示内容
+                lotteryContent.innerHTML = `
+                    <div class="lottery-city">${randomCity.name}</div>
+                    <div class="lottery-province">${randomCity.province}</div>
+                `;
+
+                // 移除动画类
+                setTimeout(() => {
+                    lotteryContent.classList.remove('changing');
+                }, 100);
+
+                changeCount++;
+
+                // 如果是最后一次变动，显示最终结果
+                if (changeCount >= maxChanges) {
+                    clearInterval(changeInterval);
+
+                    // 显示最终选中的城市
+                    lotteryContent.innerHTML = `
+                        <div class="lottery-city">${selectedCity.name}</div>
+                        <div class="lottery-province">${selectedCity.province}</div>
+                    `;
+
+                    // 显示详细结果
+                    setTimeout(() => {
+                        showLotteryResult(selectedCity);
+                        spinBtn.disabled = false;
+                        spinBtn.textContent = '🔄 再试一次';
+                        isWheelSpinning = false;
+                    }, 500);
+                }
+            }, 100);
         }
 
         // 显示抽奖结果

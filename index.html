@@ -834,9 +834,17 @@
         }
 
         @keyframes cityChange {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         .spin-btn {
@@ -1076,6 +1084,24 @@
             ? 'http://localhost:8000'
             : 'https://web-production-9cc1d.up.railway.app'; // 请替换为您的实际Railway URL
 
+        // 加载省份数据
+        async function loadProvincesData() {
+            try {
+                const response = await fetch('provinces_data.json');
+                allProvinces = await response.json();
+                console.log(`已加载 ${allProvinces.length} 个省份数据`);
+                generateProvinceCheckboxes();
+            } catch (error) {
+                console.error('加载省份数据失败:', error);
+                // 如果省份文件不存在，回退到从城市数据中提取
+                console.log('回退到从城市数据中提取省份...');
+                if (citiesData.length > 0) {
+                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                    generateProvinceCheckboxes();
+                }
+            }
+        }
+
         // 加载城市数据
         async function loadCitiesData() {
             try {
@@ -1086,20 +1112,21 @@
                         const data = await response.json();
                         citiesData = data.cities || data;
                         console.log(`已从后端API加载 ${citiesData.length} 个城市数据`);
+                        // 加载省份数据
+                        await loadProvincesData();
                         return;
                     }
                 } catch (apiError) {
                     console.log('后端API不可用，使用本地数据:', apiError);
                 }
-
+                
                 // 如果API不可用，回退到本地文件
                 const response = await fetch('cities_data.json');
                 citiesData = await response.json();
                 console.log(`已从本地文件加载 ${citiesData.length} 个城市数据`);
 
-                // 提取所有省份
-                allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
-                generateProvinceCheckboxes();
+                // 加载省份数据
+                await loadProvincesData();
             } catch (error) {
                 console.error('加载城市数据失败:', error);
                 showError('加载城市数据失败，请刷新页面重试');
@@ -1484,10 +1511,10 @@
             const changeInterval = setInterval(() => {
                 // 随机选择一个城市显示
                 const randomCity = cities[Math.floor(Math.random() * cities.length)];
-                
+
                 // 添加变动动画
                 lotteryContent.classList.add('changing');
-                
+
                 // 更新显示内容
                 lotteryContent.innerHTML = `
                     <div class="lottery-city">${randomCity.name}</div>
@@ -1504,7 +1531,7 @@
                 // 如果是最后一次变动，显示最终结果
                 if (changeCount >= maxChanges) {
                     clearInterval(changeInterval);
-                    
+
                     // 显示最终选中的城市
                     lotteryContent.innerHTML = `
                         <div class="lottery-city">${selectedCity.name}</div>
