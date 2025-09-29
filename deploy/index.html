@@ -715,6 +715,8 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes slideIn {
@@ -765,6 +767,8 @@
 
         .modal-body {
             padding: 30px;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .modal-footer {
@@ -773,6 +777,11 @@
             display: flex;
             justify-content: flex-end;
             gap: 15px;
+        }
+
+        /* 抽奖弹窗特殊样式 */
+        #lotteryModal .modal-body {
+            padding: 0;
         }
 
         /* 滚轮选择器样式 */
@@ -1176,7 +1185,7 @@
     <div class="modal-overlay" id="lotteryModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🎰 随机抽奖 - 让命运决定您的旅行</h2>
+                <h2>🎰 让命运决定您的旅行</h2>
                 <button class="close-btn" onclick="closeLotteryModal()">&times;</button>
             </div>
             <div class="modal-body">
