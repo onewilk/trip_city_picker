@@ -1465,7 +1465,9 @@
                         <p>请调整选择条件后重试</p>
                     </div>
                 `;
-                choiceHelperContainer.style.display = 'none';
+                if (choiceHelperContainer) {
+                    choiceHelperContainer.style.display = 'none';
+                }
                 return;
             }
 
@@ -1519,7 +1521,9 @@
             results.innerHTML = html;
 
             // 隐藏外部的选择困难按钮容器
-            choiceHelperContainer.style.display = 'none';
+            if (choiceHelperContainer) {
+                choiceHelperContainer.style.display = 'none';
+            }
 
             // 如果需要显示天气信息，异步获取
             if (showWeather) {
@@ -1568,14 +1572,14 @@
         function displayWeatherInfo(city, weatherData, index) {
             console.log(`开始显示${city.name}的天气信息，索引: ${index}`);
             console.log(`查找城市卡片ID: city-card-${index}`);
-            
+
             // 尝试多种方式查找城市卡片
             let cityCard = document.getElementById(`city-card-${index}`);
             if (!cityCard) {
                 // 如果通过ID找不到，尝试通过城市名称查找
                 const allCityCards = document.querySelectorAll('.city-card');
                 console.log(`通过ID未找到，尝试通过城市名称查找，总共有${allCityCards.length}个城市卡片`);
-                
+
                 for (let i = 0; i < allCityCards.length; i++) {
                     const card = allCityCards[i];
                     const cityNameElement = card.querySelector('.city-name span:last-child');
@@ -1586,18 +1590,18 @@
                     }
                 }
             }
-            
+
             console.log(`找到城市卡片:`, cityCard);
-            
+
             if (!cityCard) {
                 console.error(`未找到城市卡片，ID: city-card-${index}，城市: ${city.name}`);
                 console.log('当前页面中所有city-card元素:', document.querySelectorAll('.city-card'));
                 return;
             }
-            
+
             const weatherContainer = cityCard.querySelector('.weather-loading');
             console.log(`找到天气容器:`, weatherContainer);
-            
+
             if (!weatherContainer) {
                 console.error(`未找到天气容器，城市: ${city.name}，索引: ${index}`);
                 console.log('城市卡片内容:', cityCard.innerHTML);
