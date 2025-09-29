@@ -1362,9 +1362,7 @@
             // 获取筛选条件
             const selectedProvinces = getSelectedProvinces();
             const sameProvinceMode = document.querySelector('input[name="sameProvince"]:checked').value;
-            const weatherToggle = document.getElementById('weatherToggle');
-            // 如果天气开关元素不存在（筛选弹窗未打开），则默认显示天气信息
-            const showWeather = weatherToggle ? weatherToggle.checked : true;
+            const showWeather = document.getElementById('weatherToggle').checked;
 
             // 根据省份筛选城市
             let filteredCities = citiesData;
@@ -1525,9 +1523,12 @@
 
             // 如果需要显示天气信息，异步获取
             if (showWeather) {
-                cities.forEach((city, index) => {
-                    fetchWeatherInfo(city, index);
-                });
+                // 添加小延迟确保DOM完全渲染后再开始异步请求
+                setTimeout(() => {
+                    cities.forEach((city, index) => {
+                        fetchWeatherInfo(city, index);
+                    });
+                }, 100);
             }
         }
 
