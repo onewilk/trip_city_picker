@@ -1132,7 +1132,7 @@
                             <label class="filter-label">天气信息：</label>
                             <div class="switch-container">
                                 <label class="switch">
-                                    <input type="checkbox" id="weatherToggle" checked>
+                                    <input type="checkbox" id="weatherToggle">
                                     <span class="slider"></span>
                                 </label>
                                 <span class="switch-label">显示国庆期间天气</span>
@@ -1362,7 +1362,14 @@
             // 获取筛选条件
             const selectedProvinces = getSelectedProvinces();
             const sameProvinceMode = document.querySelector('input[name="sameProvince"]:checked').value;
-            const showWeather = document.getElementById('weatherToggle').checked;
+            const weatherToggle = document.getElementById('weatherToggle');
+            const showWeather = weatherToggle ? weatherToggle.checked : false;
+            
+            console.log('筛选条件获取结果:');
+            console.log('- 选中省份:', selectedProvinces);
+            console.log('- 同省模式:', sameProvinceMode);
+            console.log('- 天气开关元素:', weatherToggle);
+            console.log('- 天气开关状态:', showWeather);
 
             // 根据省份筛选城市
             let filteredCities = citiesData;
@@ -1522,21 +1529,29 @@
             choiceHelperContainer.style.display = 'none';
 
             // 如果需要显示天气信息，异步获取
+            console.log('showWeather状态:', showWeather);
             if (showWeather) {
+                console.log('开始获取天气信息，城市数量:', cities.length);
                 cities.forEach((city, index) => {
+                    console.log(`开始获取第${index}个城市${city.name}的天气信息`);
                     fetchWeatherInfo(city, index);
                 });
+            } else {
+                console.log('天气开关未开启，跳过天气信息获取');
             }
         }
 
         // 获取天气信息
         async function fetchWeatherInfo(city, index) {
             try {
+                console.log(`开始获取${city.name}的天气信息，索引: ${index}`);
                 // 模拟天气API调用（实际应用中需要替换为真实的天气API）
                 const weatherData = await getMockWeatherData(city);
+                console.log(`获取到${city.name}的天气数据:`, weatherData);
                 displayWeatherInfo(city, weatherData, index);
+                console.log(`成功显示${city.name}的天气信息`);
             } catch (error) {
-                console.error('获取天气信息失败:', error);
+                console.error(`获取${city.name}天气信息失败:`, error);
                 displayWeatherError(city, index);
             }
         }
@@ -1563,10 +1578,14 @@
 
         // 显示天气信息
         function displayWeatherInfo(city, weatherData, index) {
+            console.log(`开始显示${city.name}的天气信息，索引: ${index}`);
             const cityCard = document.getElementById(`city-card-${index}`);
+            console.log(`找到城市卡片:`, cityCard);
             const weatherContainer = cityCard.querySelector('.weather-loading');
+            console.log(`找到天气容器:`, weatherContainer);
 
             if (weatherContainer) {
+                console.log(`更新${city.name}的天气信息显示`);
                 weatherContainer.outerHTML = `
                     <div class="weather-info">
                         <h4>🌤️ 国庆期间天气</h4>
@@ -1593,6 +1612,8 @@
                         </p>
                     </div>
                 `;
+            } else {
+                console.error(`未找到${city.name}的天气容器，索引: ${index}`);
             }
         }
 
