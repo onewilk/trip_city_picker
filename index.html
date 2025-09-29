@@ -1088,49 +1088,67 @@
         async function loadProvincesData() {
             try {
                 const response = await fetch('provinces_data.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 allProvinces = await response.json();
-                console.log(`已加载 ${allProvinces.length} 个省份数据`);
+                console.log(`已从文件加载 ${allProvinces.length} 个省份数据`);
                 generateProvinceCheckboxes();
             } catch (error) {
-                console.error('加载省份数据失败:', error);
-                // 如果省份文件不存在，回退到从城市数据中提取
-                console.log('回退到从城市数据中提取省份...');
-                if (citiesData.length > 0) {
-                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
-                    generateProvinceCheckboxes();
-                }
+                console.warn('省份数据文件加载失败，将在城市数据加载后提取:', error.message);
+                // 不在这里处理回退，让主函数处理
+                throw error;
             }
         }
 
-        // 加载城市数据
+        // 优化后的数据加载逻辑
         async function loadCitiesData() {
             try {
-                // 优先尝试从后端API获取数据
+                // 先尝试快速加载省份数据
+                let provincesLoaded = false;
                 try {
-                    const response = await fetch(`${API_BASE_URL}/api/random-cities?count=1000`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        citiesData = data.cities || data;
-                        console.log(`已从后端API加载 ${citiesData.length} 个城市数据`);
-                        // 加载省份数据
-                        await loadProvincesData();
-                        return;
-                    }
-                } catch (apiError) {
-                    console.log('后端API不可用，使用本地数据:', apiError);
+                    await loadProvincesData();
+                    provincesLoaded = true;
+                } catch (error) {
+                    console.log('省份数据文件不可用，将从城市数据中提取');
                 }
-                
-                // 如果API不可用，回退到本地文件
-                const response = await fetch('cities_data.json');
-                citiesData = await response.json();
-                console.log(`已从本地文件加载 ${citiesData.length} 个城市数据`);
 
-                // 加载省份数据
-                await loadProvincesData();
+                // 加载城市数据
+                citiesData = await loadCitiesDataFromSource();
+                console.log(`已加载 ${citiesData.length} 个城市数据`);
+
+                // 如果省份数据没有加载成功，从城市数据中提取
+                if (!provincesLoaded) {
+                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                    console.log(`从城市数据中提取了 ${allProvinces.length} 个省份`);
+                    generateProvinceCheckboxes();
+                }
+
             } catch (error) {
-                console.error('加载城市数据失败:', error);
-                showError('加载城市数据失败，请刷新页面重试');
+                console.error('数据加载失败:', error);
+                showError('数据加载失败，请刷新页面重试');
             }
+        }
+
+        // 从各种源加载城市数据
+        async function loadCitiesDataFromSource() {
+            // 优先尝试从后端API获取数据
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/random-cities?count=1000`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('从后端API加载城市数据');
+                    return data.cities || data;
+                }
+            } catch (apiError) {
+                console.log('后端API不可用，使用本地数据:', apiError);
+            }
+            
+            // 如果API不可用，回退到本地文件
+            const response = await fetch('cities_data.json');
+            const data = await response.json();
+            console.log('从本地文件加载城市数据');
+            return data;
         }
 
         // 生成省份复选框
