@@ -99,6 +99,15 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
         .btn:active {
             transform: translateY(0);
         }
@@ -671,6 +680,14 @@
             padding: 30px;
         }
 
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
         /* 滚轮选择器样式 */
         .lottery-container {
             display: flex;
@@ -983,45 +1000,7 @@
                 <label for="cityCount">选择城市数量：</label>
                 <input type="number" id="cityCount" min="1" max="100" value="5" required>
                 <button class="btn" onclick="getRandomCities()">🎲 随机推荐</button>
-            </div>
-
-            <div class="filter-section">
-                <h3>🎯 筛选选项</h3>
-
-                <div class="filter-group">
-                    <label class="filter-label">省份筛选：</label>
-                    <div class="province-filter">
-                        <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
-                        <div class="province-checkboxes" id="provinceCheckboxes">
-                            <!-- 省份复选框将通过JavaScript动态生成 -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">同省城市：</label>
-                    <div class="radio-group">
-                        <label class="radio-item">
-                            <input type="radio" name="sameProvince" value="allow" checked>
-                            <span>允许同省多个城市</span>
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="sameProvince" value="prevent">
-                            <span>避免同省多个城市</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">天气信息：</label>
-                    <div class="switch-container">
-                        <label class="switch">
-                            <input type="checkbox" id="weatherToggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span class="switch-label">显示国庆期间天气</span>
-                    </div>
-                </div>
+                <button class="btn btn-secondary" onclick="openFilterModal()">🎯 筛选选项</button>
             </div>
         </div>
 
@@ -1037,6 +1016,58 @@
             <button class="choice-helper-btn" onclick="openLotteryModal()">
                 🎲 选择困难点我
             </button>
+        </div>
+    </div>
+
+    <!-- 筛选选项弹窗 -->
+    <div class="modal-overlay" id="filterModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎯 筛选选项</h2>
+                <button class="close-btn" onclick="closeFilterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label class="filter-label">省份筛选：</label>
+                        <div class="province-filter">
+                            <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
+                            <div class="province-checkboxes" id="provinceCheckboxes">
+                                <!-- 省份复选框将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">同省城市：</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="sameProvince" value="allow" checked>
+                                <span>允许同省多个城市</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="sameProvince" value="prevent">
+                                <span>避免同省多个城市</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">天气信息：</label>
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="weatherToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="switch-label">显示国庆期间天气</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeFilterModal()">取消</button>
+                <button class="btn" onclick="applyFilters()">应用筛选</button>
+            </div>
         </div>
     </div>
 
@@ -1143,7 +1174,7 @@
             } catch (apiError) {
                 console.log('后端API不可用，使用本地数据:', apiError);
             }
-            
+
             // 如果API不可用，回退到本地文件
             const response = await fetch('cities_data.json');
             const data = await response.json();
@@ -1493,6 +1524,25 @@
             modal.style.display = 'flex';
         }
 
+        // 打开筛选选项弹窗
+        function openFilterModal() {
+            const modal = document.getElementById('filterModal');
+            modal.style.display = 'flex';
+        }
+
+        // 关闭筛选选项弹窗
+        function closeFilterModal() {
+            const modal = document.getElementById('filterModal');
+            modal.style.display = 'none';
+        }
+
+        // 应用筛选选项
+        function applyFilters() {
+            closeFilterModal();
+            // 可以在这里添加应用筛选后的逻辑
+            console.log('筛选选项已应用');
+        }
+
         // 关闭滚轮抽奖弹窗
         function closeLotteryModal() {
             const modal = document.getElementById('lotteryModal');
@@ -1641,9 +1691,15 @@
 
         // 点击弹窗外部关闭
         document.addEventListener('click', function (e) {
-            const modal = document.getElementById('lotteryModal');
-            if (e.target === modal) {
+            const lotteryModal = document.getElementById('lotteryModal');
+            const filterModal = document.getElementById('filterModal');
+            
+            if (e.target === lotteryModal) {
                 closeLotteryModal();
+            }
+            
+            if (e.target === filterModal) {
+                closeFilterModal();
             }
         });
 
@@ -1651,6 +1707,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeLotteryModal();
+                closeFilterModal();
             }
         });
 
