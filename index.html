@@ -29,17 +29,18 @@
         }
 
         .header {
-            background: transparent;
-            color: #333;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
             text-align: center;
-            padding: 20px 0;
+            padding: 30px 20px;
         }
 
         .header h1 {
             font-size: 2em;
             margin-bottom: 0;
             font-weight: 700;
-            color: #333;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -375,6 +376,19 @@
             border-bottom: 1px solid #eee;
         }
 
+        .filter-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row .filter-group {
+            flex: 1;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
         .filter-group:last-child {
             border-bottom: none;
             margin-bottom: 0;
@@ -608,8 +622,6 @@
             margin-top: 20px;
             margin-bottom: 20px;
             padding: 20px 0;
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .choice-helper-btn {
@@ -1105,20 +1117,23 @@
             </div>
             <div class="modal-body">
                 <div class="filter-section">
-                    <div class="filter-group">
-                        <label class="filter-label">城市数量：</label>
-                        <div class="input-group">
-                            <input type="number" id="cityCount" min="1" max="100" value="5" required>
-                            <span class="input-suffix">个城市</span>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">城市数量：</label>
+                            <div class="input-group">
+                                <input type="number" id="cityCount" min="1" max="100" value="5" required>
+                                <span class="input-suffix">个城市</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="filter-group">
-                        <label class="filter-label">省份筛选：</label>
-                        <div class="province-filter">
-                            <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
-                            <div class="province-checkboxes" id="provinceCheckboxes">
-                                <!-- 省份复选框将通过JavaScript动态生成 -->
+                        <div class="filter-group">
+                            <label class="filter-label">天气信息：</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="weatherToggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">显示国庆期间天气</span>
                             </div>
                         </div>
                     </div>
@@ -1138,13 +1153,12 @@
                     </div>
 
                     <div class="filter-group">
-                        <label class="filter-label">天气信息：</label>
-                        <div class="switch-container">
-                            <label class="switch">
-                                <input type="checkbox" id="weatherToggle">
-                                <span class="slider"></span>
-                            </label>
-                            <span class="switch-label">显示国庆期间天气</span>
+                        <label class="filter-label">省份筛选：</label>
+                        <div class="province-filter">
+                            <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
+                            <div class="province-checkboxes" id="provinceCheckboxes">
+                                <!-- 省份复选框将通过JavaScript动态生成 -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1487,14 +1501,21 @@
                 `;
             });
 
+            // 添加选择困难按钮（当推荐城市数量大于1时）
+            if (cities.length > 1) {
+                html += `
+                    <div class="choice-helper-container">
+                        <button class="choice-helper-btn" onclick="openLotteryModal()">
+                            🎲 选择困难点我
+                        </button>
+                    </div>
+                `;
+            }
+
             results.innerHTML = html;
 
-            // 显示选择困难按钮（当推荐城市数量大于1时）
-            if (cities.length > 1) {
-                choiceHelperContainer.style.display = 'block';
-            } else {
-                choiceHelperContainer.style.display = 'none';
-            }
+            // 隐藏外部的选择困难按钮容器
+            choiceHelperContainer.style.display = 'none';
 
             // 如果需要显示天气信息，异步获取
             if (showWeather) {
