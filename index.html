@@ -197,6 +197,7 @@
 
         .results {
             padding: 40px;
+            padding-bottom: 60px;
             min-height: 200px;
         }
 
@@ -604,6 +605,7 @@
         .choice-helper-container {
             text-align: center;
             margin-top: 20px;
+            margin-bottom: 20px;
             padding: 20px 0;
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -1072,7 +1074,7 @@
             <div class="no-results">
                 <h3>🎯 准备开始您的旅行计划</h3>
             </div>
-            
+
             <!-- 选择困难按钮 -->
             <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
                 <button class="choice-helper-btn" onclick="openLotteryModal()">
@@ -1085,7 +1087,7 @@
     <!-- 固定底部按钮区域 -->
     <div class="fixed-bottom-buttons">
         <button class="btn btn-filter" onclick="openFilterModal()">
-            <span class="btn-text">⚙️ 筛选选项</span>
+            <span class="btn-text">⚙️ 筛选</span>
             <span class="btn-icon">⚙️</span>
         </button>
         <button class="btn btn-recommend" onclick="getRandomCities()">
@@ -1097,7 +1099,7 @@
     <div class="modal-overlay" id="filterModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>🎯 筛选选项</h2>
+                <h2>🎯 筛选</h2>
                 <button class="close-btn" onclick="closeFilterModal()">&times;</button>
             </div>
             <div class="modal-body">
