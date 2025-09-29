@@ -1211,6 +1211,8 @@
         let allProvinces = [];
         let currentRecommendedCities = [];
         let isWheelSpinning = false;
+        let dataLoaded = false;
+        let pendingRecommendation = false;
 
         // API配置
         const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -1218,48 +1220,33 @@
             : 'https://web-production-9cc1d.up.railway.app'; // 请替换为您的实际Railway URL
 
         // 加载省份数据
-        async function loadProvincesData() {
-            try {
-                const response = await fetch('provinces_data.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                allProvinces = await response.json();
-                console.log(`已从文件加载 ${allProvinces.length} 个省份数据`);
-                generateProvinceCheckboxes();
-            } catch (error) {
-                console.warn('省份数据文件加载失败，将在城市数据加载后提取:', error.message);
-                // 不在这里处理回退，让主函数处理
-                throw error;
-            }
-        }
 
         // 优化后的数据加载逻辑
         async function loadCitiesData() {
             try {
-                // 先尝试快速加载省份数据
-                let provincesLoaded = false;
-                try {
-                    await loadProvincesData();
-                    provincesLoaded = true;
-                } catch (error) {
-                    console.log('省份数据文件不可用，将从城市数据中提取');
-                }
-
                 // 加载城市数据
                 citiesData = await loadCitiesDataFromSource();
                 console.log(`已加载 ${citiesData.length} 个城市数据`);
 
-                // 如果省份数据没有加载成功，从城市数据中提取
-                if (!provincesLoaded) {
-                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
-                    console.log(`从城市数据中提取了 ${allProvinces.length} 个省份`);
-                    generateProvinceCheckboxes();
+                // 从城市数据中提取省份
+                allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                console.log(`从城市数据中提取了 ${allProvinces.length} 个省份`);
+                generateProvinceCheckboxes();
+
+                // 标记数据加载完成
+                dataLoaded = true;
+
+                // 如果有待处理的推荐请求，自动触发
+                if (pendingRecommendation) {
+                    pendingRecommendation = false;
+                    hideLoading();
+                    getRandomCities();
                 }
 
             } catch (error) {
                 console.error('数据加载失败:', error);
                 showError('数据加载失败，请刷新页面重试');
+                pendingRecommendation = false;
             }
         }
 
@@ -1339,9 +1326,17 @@
         }
 
         // 显示加载状态
-        function showLoading() {
+        function showLoading(message = '正在为您推荐城市...') {
             const results = document.getElementById('results');
-            results.innerHTML = '<div class="loading">正在为您推荐城市...</div>';
+            results.innerHTML = `<div class="loading">${message}</div>`;
+        }
+
+        function hideLoading() {
+            const results = document.getElementById('results');
+            const loading = results.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
         }
 
         // 随机获取城市
@@ -1350,6 +1345,13 @@
 
             if (!cityCount || cityCount < 1 || cityCount > 100) {
                 alert('请输入1-100之间的数字');
+                return;
+            }
+
+            // 如果数据还没有加载完成，显示加载提示并等待
+            if (!dataLoaded) {
+                showLoading('正在加载城市数据，请稍候...');
+                pendingRecommendation = true;
                 return;
             }
 
