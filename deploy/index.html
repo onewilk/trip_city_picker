@@ -1569,11 +1569,28 @@
             console.log(`开始显示${city.name}的天气信息，索引: ${index}`);
             console.log(`查找城市卡片ID: city-card-${index}`);
             
-            const cityCard = document.getElementById(`city-card-${index}`);
+            // 尝试多种方式查找城市卡片
+            let cityCard = document.getElementById(`city-card-${index}`);
+            if (!cityCard) {
+                // 如果通过ID找不到，尝试通过城市名称查找
+                const allCityCards = document.querySelectorAll('.city-card');
+                console.log(`通过ID未找到，尝试通过城市名称查找，总共有${allCityCards.length}个城市卡片`);
+                
+                for (let i = 0; i < allCityCards.length; i++) {
+                    const card = allCityCards[i];
+                    const cityNameElement = card.querySelector('.city-name span:last-child');
+                    if (cityNameElement && cityNameElement.textContent.trim() === city.name) {
+                        cityCard = card;
+                        console.log(`通过城市名称找到卡片，实际索引: ${i}`);
+                        break;
+                    }
+                }
+            }
+            
             console.log(`找到城市卡片:`, cityCard);
             
             if (!cityCard) {
-                console.error(`未找到城市卡片，ID: city-card-${index}`);
+                console.error(`未找到城市卡片，ID: city-card-${index}，城市: ${city.name}`);
                 console.log('当前页面中所有city-card元素:', document.querySelectorAll('.city-card'));
                 return;
             }
