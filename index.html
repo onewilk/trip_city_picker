@@ -52,6 +52,13 @@
             background: #f8f9fa;
         }
 
+        .control-panel .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
         .input-group {
             display: inline-flex;
             align-items: center;
@@ -81,6 +88,12 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .input-suffix {
+            color: #6c757d;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -106,6 +119,21 @@
 
         .btn-secondary:hover {
             box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-full {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            min-width: 120px;
+        }
+
+        .btn-filter:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
 
         .btn:active {
@@ -997,17 +1025,15 @@
 
         <div class="control-panel">
             <div class="input-group">
-                <label for="cityCount">选择城市数量：</label>
-                <input type="number" id="cityCount" min="1" max="100" value="5" required>
-                <button class="btn" onclick="getRandomCities()">🎲 随机推荐</button>
-                <button class="btn btn-secondary" onclick="openFilterModal()">🎯 筛选选项</button>
+                <button class="btn btn-full" onclick="getRandomCities()">🎲 随机推荐</button>
+                <button class="btn btn-filter" onclick="openFilterModal()">⚙️ 筛选选项</button>
             </div>
         </div>
 
         <div class="results" id="results">
             <div class="no-results">
                 <h3>🎯 准备开始您的旅行计划</h3>
-                <p>选择您想要的城市数量，点击"随机推荐"按钮开始探索</p>
+                <p>点击"随机推荐"按钮开始探索，或点击"筛选选项"进行个性化设置</p>
             </div>
         </div>
 
@@ -1028,6 +1054,14 @@
             </div>
             <div class="modal-body">
                 <div class="filter-section">
+                    <div class="filter-group">
+                        <label class="filter-label">城市数量：</label>
+                        <div class="input-group">
+                            <input type="number" id="cityCount" min="1" max="100" value="5" required>
+                            <span class="input-suffix">个城市</span>
+                        </div>
+                    </div>
+
                     <div class="filter-group">
                         <label class="filter-label">省份筛选：</label>
                         <div class="province-filter">
@@ -1539,8 +1573,9 @@
         // 应用筛选选项
         function applyFilters() {
             closeFilterModal();
-            // 可以在这里添加应用筛选后的逻辑
-            console.log('筛选选项已应用');
+            // 获取城市数量
+            const cityCount = document.getElementById('cityCount').value;
+            console.log('筛选选项已应用，城市数量：', cityCount);
         }
 
         // 关闭滚轮抽奖弹窗
@@ -1693,11 +1728,11 @@
         document.addEventListener('click', function (e) {
             const lotteryModal = document.getElementById('lotteryModal');
             const filterModal = document.getElementById('filterModal');
-            
+
             if (e.target === lotteryModal) {
                 closeLotteryModal();
             }
-            
+
             if (e.target === filterModal) {
                 closeFilterModal();
             }
