@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国旅游城市随机推荐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .control-panel {
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .input-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-group label {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1.1em;
+            width: 100px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            padding: 40px;
+            min-height: 200px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .city-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .city-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .city-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .city-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .city-tag {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .city-region {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .activities {
+            margin-top: 15px;
+        }
+
+        .activities h4 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .activity-item {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stats p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .filter-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .province-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .province-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .province-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+
+        .province-checkbox:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .province-checkbox:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
+        }
+
+        .province-checkbox input[type="checkbox"] {
+            margin: 0;
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        .province-checkbox label {
+            font-size: 0.9em;
+            cursor: pointer;
+            margin: 0;
+            pointer-events: none;
+            flex: 1;
+        }
+
+        .province-checkbox input[type="checkbox"]:checked+label {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .province-checkbox:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .province-checkbox:has(input[type="checkbox"]:checked) label {
+            color: white;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .radio-item:hover {
+            background: #f8f9fa;
+        }
+
+        .radio-item input[type="radio"] {
+            margin: 0;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #667eea;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .switch-label {
+            font-size: 1em;
+            color: #333;
+        }
+
+        .weather-info {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .weather-info h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .weather-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .weather-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .weather-loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 8px;
+        }
+
+        /* 选择困难按钮样式 */
+        .choice-helper-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 30px rgba(255, 154, 158, 0.3);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .choice-helper-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .choice-helper-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.6);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 选择困难按钮显示/隐藏动画 */
+        .choice-helper-container {
+            animation: slideUpIn 0.5s ease-out;
+        }
+
+        @keyframes slideUpIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 为页面内容添加底部间距，避免被固定按钮遮挡 */
+        .container {
+            padding-bottom: 100px;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* 滚轮选择器样式 */
+        .lottery-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .picker-container {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            position: relative;
+        }
+
+        .picker-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+        }
+
+        .picker-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(248, 249, 250, 0.9) 0%,
+                    rgba(248, 249, 250, 0.1) 20%,
+                    transparent 30%,
+                    transparent 70%,
+                    rgba(248, 249, 250, 0.1) 80%,
+                    rgba(248, 249, 250, 0.9) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .picker-indicator {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3;
+            pointer-events: none;
+            padding: 0 10px;
+        }
+
+        .picker-indicator::before {
+            content: '➡️';
+            font-size: 24px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .picker-indicator::after {
+            content: '⬅️';
+            font-size: 24px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .picker-wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+        }
+
+        .picker-item {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            transform-origin: center center;
+        }
+
+        .picker-item:nth-child(odd) {
+            background: #f8f9fa;
+        }
+
+        .picker-item.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.2em;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            z-index: 1;
+        }
+
+        .picker-item.fade {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+
+        .lottery-controls {
+            text-align: center;
+        }
+
+        .spin-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .lottery-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border-radius: 15px;
+            animation: resultSlideIn 0.5s ease;
+        }
+
+        @keyframes resultSlideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .lottery-result h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+        }
+
+        .result-city {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .city-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .activity-list {
+                justify-content: center;
+            }
+
+            .province-checkboxes {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .switch-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .picker-container {
+                max-width: 280px;
+                height: 180px;
+            }
+
+            .picker-item {
+                height: 35px;
+                font-size: 1em;
+            }
+
+            .choice-helper-container {
+                padding: 15px;
+            }
+
+            .choice-helper-btn {
+                padding: 12px 30px;
+                font-size: 1.1em;
+            }
+
+            .container {
+                padding-bottom: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ 中国旅游城市随机推荐</h1>
+            <p>发现100个值得探索的美丽城市，开启您的精彩旅程</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <label for="cityCount">选择城市数量：</label>
+                <input type="number" id="cityCount" min="1" max="100" value="5" required>
+                <button class="btn" onclick="getRandomCities()">🎲 随机推荐</button>
+            </div>
+
+            <div class="filter-section">
+                <h3>🎯 筛选选项</h3>
+
+                <div class="filter-group">
+                    <label class="filter-label">省份筛选：</label>
+                    <div class="province-filter">
+                        <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
+                        <div class="province-checkboxes" id="provinceCheckboxes">
+                            <!-- 省份复选框将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">同省城市：</label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="sameProvince" value="allow" checked>
+                            <span>允许同省多个城市</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="sameProvince" value="prevent">
+                            <span>避免同省多个城市</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">天气信息：</label>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" id="weatherToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-label">显示国庆期间天气</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="no-results">
+                <h3>🎯 准备开始您的旅行计划</h3>
+                <p>选择您想要的城市数量，点击"随机推荐"按钮开始探索</p>
+            </div>
+        </div>
+
+        <!-- 选择困难按钮 -->
+        <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
+            <button class="choice-helper-btn" onclick="openLotteryModal()">
+                🎲 选择困难点我
+            </button>
+        </div>
+    </div>
+
+    <!-- 滚轮抽奖弹窗 -->
+    <div class="modal-overlay" id="lotteryModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎰 滚轮抽奖 - 让命运决定您的旅行</h2>
+                <button class="close-btn" onclick="closeLotteryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="lottery-container">
+                    <div class="picker-container">
+                        <div class="picker-wrapper">
+                            <div class="picker-mask"></div>
+                            <div class="picker-indicator"></div>
+                            <div class="picker-wheel" id="pickerWheel">
+                                <!-- 滚轮项目将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lottery-controls">
+                        <button class="spin-btn" id="spinBtn" onclick="spinPicker()">
+                            🎯 开始
+                        </button>
+                        <div class="lottery-result" id="lotteryResult" style="display: none;">
+                            <h3>🎉 恭喜您！</h3>
+                            <div class="result-city" id="resultCity"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let citiesData = [];
+        let allProvinces = [];
+        let currentRecommendedCities = [];
+        let isWheelSpinning = false;
+
+        // 加载城市数据
+        async function loadCitiesData() {
+            try {
+                const response = await fetch('cities_data.json');
+                citiesData = await response.json();
+                console.log(`已加载 ${citiesData.length} 个城市数据`);
+
+                // 提取所有省份
+                allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                generateProvinceCheckboxes();
+            } catch (error) {
+                console.error('加载城市数据失败:', error);
+                showError('加载城市数据失败，请刷新页面重试');
+            }
+        }
+
+        // 生成省份复选框
+        function generateProvinceCheckboxes() {
+            const container = document.getElementById('provinceCheckboxes');
+            container.innerHTML = '';
+
+            allProvinces.forEach(province => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'province-checkbox';
+                checkboxDiv.innerHTML = `
+                    <input type="checkbox" id="province_${province}" value="${province}" checked>
+                    <label for="province_${province}">${province}</label>
+                `;
+
+                // 添加点击事件监听器，点击整个按钮区域都可以触发
+                checkboxDiv.addEventListener('click', function (e) {
+                    // 如果点击的是checkbox本身，不重复处理
+                    if (e.target.type === 'checkbox') {
+                        return;
+                    }
+
+                    // 找到对应的checkbox并切换状态
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                        // 触发change事件，确保其他监听器也能响应
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+
+                container.appendChild(checkboxDiv);
+            });
+        }
+
+        // 全选/全不选省份
+        function toggleAllProvinces() {
+            const checkboxes = document.querySelectorAll('.province-checkbox input[type="checkbox"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="no-results">
+                    <h3>❌ 出错了</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="loading">正在为您推荐城市...</div>';
+        }
+
+        // 随机获取城市
+        function getRandomCities() {
+            const cityCount = parseInt(document.getElementById('cityCount').value);
+
+            if (!cityCount || cityCount < 1 || cityCount > 100) {
+                alert('请输入1-100之间的数字');
+                return;
+            }
+
+            if (citiesData.length === 0) {
+                showError('城市数据尚未加载完成，请稍后再试');
+                return;
+            }
+
+            // 获取筛选条件
+            const selectedProvinces = getSelectedProvinces();
+            const sameProvinceMode = document.querySelector('input[name="sameProvince"]:checked').value;
+            const showWeather = document.getElementById('weatherToggle').checked;
+
+            // 根据省份筛选城市
+            let filteredCities = citiesData;
+            if (selectedProvinces.length > 0) {
+                filteredCities = citiesData.filter(city => selectedProvinces.includes(city.province));
+            }
+
+            if (filteredCities.length === 0) {
+                alert('所选省份中没有城市数据，请重新选择省份');
+                return;
+            }
+
+            if (cityCount > filteredCities.length) {
+                alert(`所选省份中最多只能选择 ${filteredCities.length} 个城市`);
+                return;
+            }
+
+            showLoading();
+
+            // 模拟加载延迟，提供更好的用户体验
+            setTimeout(() => {
+                let randomCities;
+
+                if (sameProvinceMode === 'prevent') {
+                    // 避免同省多个城市
+                    randomCities = getRandomCitiesFromDifferentProvinces(filteredCities, cityCount);
+                } else {
+                    // 允许同省多个城市
+                    randomCities = getRandomElements(filteredCities, cityCount);
+                }
+
+                displayResults(randomCities, showWeather);
+            }, 800);
+        }
+
+        // 获取选中的省份
+        function getSelectedProvinces() {
+            const checkboxes = document.querySelectorAll('.province-checkbox input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        // 从不同省份随机选择城市
+        function getRandomCitiesFromDifferentProvinces(cities, count) {
+            const provinceGroups = {};
+
+            // 按省份分组
+            cities.forEach(city => {
+                if (!provinceGroups[city.province]) {
+                    provinceGroups[city.province] = [];
+                }
+                provinceGroups[city.province].push(city);
+            });
+
+            const provinces = Object.keys(provinceGroups);
+            const result = [];
+
+            // 如果请求的城市数量大于省份数量，先每个省份选一个
+            if (count <= provinces.length) {
+                const shuffledProvinces = [...provinces].sort(() => 0.5 - Math.random());
+                for (let i = 0; i < count; i++) {
+                    const province = shuffledProvinces[i];
+                    const randomCity = getRandomElements(provinceGroups[province], 1)[0];
+                    result.push(randomCity);
+                }
+            } else {
+                // 如果请求的城市数量大于省份数量，先每个省份选一个，然后随机补充
+                provinces.forEach(province => {
+                    const randomCity = getRandomElements(provinceGroups[province], 1)[0];
+                    result.push(randomCity);
+                });
+
+                // 随机补充剩余的城市
+                const remainingCount = count - provinces.length;
+                const allRemainingCities = cities.filter(city => !result.includes(city));
+                const additionalCities = getRandomElements(allRemainingCities, Math.min(remainingCount, allRemainingCities.length));
+                result.push(...additionalCities);
+            }
+
+            return result;
+        }
+
+        // 从数组中随机选择指定数量的元素
+        function getRandomElements(array, count) {
+            const shuffled = [...array].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // 显示结果
+        function displayResults(cities, showWeather = false) {
+            const results = document.getElementById('results');
+            const choiceHelperContainer = document.getElementById('choiceHelperContainer');
+
+            // 保存当前推荐的城市
+            currentRecommendedCities = cities;
+
+            if (cities.length === 0) {
+                results.innerHTML = `
+                    <div class="no-results">
+                        <h3>😔 没有找到城市</h3>
+                        <p>请调整选择条件后重试</p>
+                    </div>
+                `;
+                choiceHelperContainer.style.display = 'none';
+                return;
+            }
+
+            // 统计信息
+            const regions = [...new Set(cities.map(city => city.region))];
+            const provinces = [...new Set(cities.map(city => city.province))];
+
+            let html = `
+                <div class="stats">
+                    <h3>📊 推荐统计</h3>
+                    <p>共推荐 <strong>${cities.length}</strong> 个城市，覆盖 <strong>${regions.length}</strong> 个地区，<strong>${provinces.length}</strong> 个省市</p>
+                </div>
+            `;
+
+            // 城市卡片
+            cities.forEach((city, index) => {
+                html += `
+                    <div class="city-card" id="city-card-${index}">
+                        <div class="city-name">
+                            <span>${index + 1}.</span>
+                            <span>${city.name}</span>
+                        </div>
+                        <div class="city-info">
+                            <span class="city-tag">${city.province}</span>
+                            <span class="city-region">${city.region}</span>
+                        </div>
+                        <div class="activities">
+                            <h4>🎯 主要玩法：</h4>
+                            <div class="activity-list">
+                                ${city.activities.map(activity =>
+                    `<span class="activity-item">${activity}</span>`
+                ).join('')}
+                            </div>
+                        </div>
+                        ${showWeather ? '<div class="weather-loading">正在获取天气信息...</div>' : ''}
+                    </div>
+                `;
+            });
+
+            results.innerHTML = html;
+
+            // 显示选择困难按钮（当推荐城市数量大于1时）
+            if (cities.length > 1) {
+                choiceHelperContainer.style.display = 'block';
+            } else {
+                choiceHelperContainer.style.display = 'none';
+            }
+
+            // 如果需要显示天气信息，异步获取
+            if (showWeather) {
+                cities.forEach((city, index) => {
+                    fetchWeatherInfo(city, index);
+                });
+            }
+        }
+
+        // 获取天气信息
+        async function fetchWeatherInfo(city, index) {
+            try {
+                // 模拟天气API调用（实际应用中需要替换为真实的天气API）
+                const weatherData = await getMockWeatherData(city);
+                displayWeatherInfo(city, weatherData, index);
+            } catch (error) {
+                console.error('获取天气信息失败:', error);
+                displayWeatherError(city, index);
+            }
+        }
+
+        // 模拟天气数据（实际应用中应该调用真实的天气API）
+        async function getMockWeatherData(city) {
+            // 模拟API延迟
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000));
+
+            // 模拟天气数据
+            const weatherConditions = ['晴天', '多云', '小雨', '中雨', '阴天', '晴转多云'];
+            const temperatures = [15, 18, 22, 25, 28, 30, 32];
+
+            return {
+                city: city.name,
+                date: '2024-10-01',
+                condition: weatherConditions[Math.floor(Math.random() * weatherConditions.length)],
+                temperature: temperatures[Math.floor(Math.random() * temperatures.length)],
+                humidity: Math.floor(Math.random() * 40) + 40,
+                windSpeed: Math.floor(Math.random() * 10) + 2,
+                description: '国庆期间天气良好，适合旅游'
+            };
+        }
+
+        // 显示天气信息
+        function displayWeatherInfo(city, weatherData, index) {
+            const cityCard = document.getElementById(`city-card-${index}`);
+            const weatherContainer = cityCard.querySelector('.weather-loading');
+
+            if (weatherContainer) {
+                weatherContainer.outerHTML = `
+                    <div class="weather-info">
+                        <h4>🌤️ 国庆期间天气</h4>
+                        <div class="weather-details">
+                            <div class="weather-item">
+                                <strong>天气状况</strong><br>
+                                ${weatherData.condition}
+                            </div>
+                            <div class="weather-item">
+                                <strong>温度</strong><br>
+                                ${weatherData.temperature}°C
+                            </div>
+                            <div class="weather-item">
+                                <strong>湿度</strong><br>
+                                ${weatherData.humidity}%
+                            </div>
+                            <div class="weather-item">
+                                <strong>风力</strong><br>
+                                ${weatherData.windSpeed} m/s
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                            ${weatherData.description}
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // 显示天气错误信息
+        function displayWeatherError(city, index) {
+            const cityCard = document.getElementById(`city-card-${index}`);
+            const weatherContainer = cityCard.querySelector('.weather-loading');
+
+            if (weatherContainer) {
+                weatherContainer.outerHTML = `
+                    <div class="weather-info" style="background: linear-gradient(135deg, #ff7675, #d63031);">
+                        <h4>⚠️ 天气信息获取失败</h4>
+                        <p>无法获取 ${city.name} 的天气信息，请稍后重试</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 打开滚轮抽奖弹窗
+        function openLotteryModal() {
+            const modal = document.getElementById('lotteryModal');
+            const pickerWheel = document.getElementById('pickerWheel');
+            const result = document.getElementById('lotteryResult');
+            const spinBtn = document.getElementById('spinBtn');
+
+            // 重置状态
+            result.style.display = 'none';
+            spinBtn.disabled = false;
+            isWheelSpinning = false;
+
+            // 生成滚轮项目
+            generatePickerItems();
+
+            // 显示弹窗
+            modal.style.display = 'flex';
+        }
+
+        // 关闭滚轮抽奖弹窗
+        function closeLotteryModal() {
+            const modal = document.getElementById('lotteryModal');
+            modal.style.display = 'none';
+        }
+
+        // 生成滚轮项目
+        function generatePickerItems() {
+            const pickerWheel = document.getElementById('pickerWheel');
+            pickerWheel.innerHTML = '';
+
+            const cities = currentRecommendedCities;
+            const itemHeight = 40;
+            const visibleItems = 5; // 可见项目数量
+            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移
+
+            // 为了确保循环展示无空白，创建更多重复项目
+            // 至少需要足够多的项目来支持多圈滚动
+            const repeatCount = Math.max(10, Math.ceil(1000 / cities.length)); // 确保有足够的项目
+            const extendedCities = [];
+            for (let i = 0; i < repeatCount; i++) {
+                extendedCities.push(...cities);
+            }
+
+            extendedCities.forEach((city, index) => {
+                const item = document.createElement('div');
+                item.className = 'picker-item';
+                item.style.top = `${index * itemHeight}px`;
+                item.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.9em; font-weight: bold;">${city.name}</div>
+                        <div style="font-size: 0.7em; opacity: 0.8;">${city.province}</div>
+                    </div>
+                `;
+                item.dataset.cityIndex = index % cities.length;
+                item.dataset.cityData = JSON.stringify(city);
+                pickerWheel.appendChild(item);
+            });
+
+            // 设置初始位置到中间（从第一个完整循环开始）
+            pickerWheel.style.transform = `translateY(-${cities.length * itemHeight + centerOffset}px)`;
+        }
+
+        // 旋转滚轮选择器
+        function spinPicker() {
+            if (isWheelSpinning) return;
+
+            const pickerWheel = document.getElementById('pickerWheel');
+            const spinBtn = document.getElementById('spinBtn');
+            const result = document.getElementById('lotteryResult');
+
+            // 禁用按钮
+            spinBtn.disabled = true;
+            isWheelSpinning = true;
+            result.style.display = 'none';
+
+            // 计算滚动参数
+            const cities = currentRecommendedCities;
+            const itemHeight = 40;
+            const visibleItems = 5;
+            const centerOffset = (visibleItems - 1) / 2 * itemHeight; // 中心偏移量
+
+            // 随机选择结果
+            const randomIndex = Math.floor(Math.random() * cities.length);
+            const selectedCity = cities[randomIndex];
+
+            // 计算最终滚动位置
+            // 目标：让选中的城市出现在中间位置（第3个位置，索引2）
+            // 中间位置在滚轮中的Y坐标是：centerOffset
+            // 要让第randomIndex个城市出现在中间，需要滚动到：randomIndex * itemHeight - centerOffset
+            const targetPosition = randomIndex * itemHeight - centerOffset;
+
+            // 添加多圈滚动效果（至少5圈）
+            const baseScroll = cities.length * itemHeight * (5 + Math.random() * 3);
+            const finalScroll = baseScroll + targetPosition;
+
+            console.log('抽奖调试信息:', {
+                randomIndex,
+                selectedCity: selectedCity.name,
+                targetPosition,
+                finalScroll,
+                centerOffset
+            });
+
+            // 应用滚动
+            pickerWheel.style.transform = `translateY(-${finalScroll}px)`;
+
+            // 等待动画完成后显示结果
+            setTimeout(() => {
+                showLotteryResult(selectedCity);
+                spinBtn.disabled = false;
+                isWheelSpinning = false;
+            }, 3000);
+        }
+
+        // 显示抽奖结果
+        function showLotteryResult(city) {
+            const result = document.getElementById('lotteryResult');
+            const resultCity = document.getElementById('resultCity');
+
+            // 滚轮弹窗始终显示天气信息，忽略开关状态
+            const weatherHtml = `
+                <div id="lottery-weather-container" style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">🌤️ 正在获取天气信息...</div>
+                </div>
+            `;
+
+            resultCity.innerHTML = `
+                <div style="font-size: 1.2em; margin-bottom: 10px;">🏛️ ${city.name}</div>
+                <div style="font-size: 1em; margin-bottom: 8px;">📍 ${city.province} · ${city.region}</div>
+                <div style="font-size: 0.9em; opacity: 0.9; margin-bottom: 10px;">
+                    🎯 推荐玩法：${city.activities.slice(0, 3).join('、')}
+                </div>
+                ${weatherHtml}
+            `;
+
+            result.style.display = 'block';
+
+            // 始终获取天气信息
+            fetchWeatherForLottery(city);
+        }
+
+        // 为抽奖结果获取天气信息
+        async function fetchWeatherForLottery(city) {
+            try {
+                console.log('开始获取抽奖结果的天气信息:', city.name);
+                const weatherData = await getMockWeatherData(city);
+                console.log('获取到天气数据:', weatherData);
+                displayWeatherForLottery(weatherData);
+            } catch (error) {
+                console.error('获取天气信息失败:', error);
+                displayWeatherErrorForLottery(city);
+            }
+        }
+
+        // 显示抽奖结果的天气信息
+        function displayWeatherForLottery(weatherData) {
+            const weatherContainer = document.getElementById('lottery-weather-container');
+
+            if (weatherContainer) {
+                weatherContainer.innerHTML = `
+                    <div style="font-size: 0.9em; margin-bottom: 8px;">🌤️ 国庆期间天气</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.8em;">
+                        <div>天气：${weatherData.condition}</div>
+                        <div>温度：${weatherData.temperature}°C</div>
+                        <div>湿度：${weatherData.humidity}%</div>
+                        <div>风力：${weatherData.windSpeed} m/s</div>
+                    </div>
+                    <div style="font-size: 0.8em; margin-top: 8px; opacity: 0.9;">
+                        ${weatherData.description}
+                    </div>
+                `;
+            }
+        }
+
+        // 显示抽奖结果的天气错误信息
+        function displayWeatherErrorForLottery(city) {
+            const weatherContainer = document.getElementById('lottery-weather-container');
+
+            if (weatherContainer) {
+                weatherContainer.innerHTML = `
+                    <div style="font-size: 0.9em;">⚠️ 无法获取 ${city.name} 的天气信息</div>
+                `;
+                weatherContainer.style.background = 'rgba(255, 107, 107, 0.2)';
+            }
+        }
+
+        // 点击弹窗外部关闭
+        document.addEventListener('click', function (e) {
+            const modal = document.getElementById('lotteryModal');
+            if (e.target === modal) {
+                closeLotteryModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeLotteryModal();
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            loadCitiesData();
+
+            // 添加回车键支持
+            document.getElementById('cityCount').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    getRandomCities();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
