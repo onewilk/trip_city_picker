@@ -1566,37 +1566,55 @@
 
         // 显示天气信息
         function displayWeatherInfo(city, weatherData, index) {
+            console.log(`开始显示${city.name}的天气信息，索引: ${index}`);
+            console.log(`查找城市卡片ID: city-card-${index}`);
+            
             const cityCard = document.getElementById(`city-card-${index}`);
-            const weatherContainer = cityCard.querySelector('.weather-loading');
-
-            if (weatherContainer) {
-                weatherContainer.outerHTML = `
-                    <div class="weather-info">
-                        <h4>🌤️ 国庆期间天气</h4>
-                        <div class="weather-details">
-                            <div class="weather-item">
-                                <strong>天气状况</strong><br>
-                                ${weatherData.condition}
-                            </div>
-                            <div class="weather-item">
-                                <strong>温度</strong><br>
-                                ${weatherData.temperature}°C
-                            </div>
-                            <div class="weather-item">
-                                <strong>湿度</strong><br>
-                                ${weatherData.humidity}%
-                            </div>
-                            <div class="weather-item">
-                                <strong>风力</strong><br>
-                                ${weatherData.windSpeed} m/s
-                            </div>
-                        </div>
-                        <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
-                            ${weatherData.description}
-                        </p>
-                    </div>
-                `;
+            console.log(`找到城市卡片:`, cityCard);
+            
+            if (!cityCard) {
+                console.error(`未找到城市卡片，ID: city-card-${index}`);
+                console.log('当前页面中所有city-card元素:', document.querySelectorAll('.city-card'));
+                return;
             }
+            
+            const weatherContainer = cityCard.querySelector('.weather-loading');
+            console.log(`找到天气容器:`, weatherContainer);
+            
+            if (!weatherContainer) {
+                console.error(`未找到天气容器，城市: ${city.name}，索引: ${index}`);
+                console.log('城市卡片内容:', cityCard.innerHTML);
+                return;
+            }
+
+            console.log(`更新${city.name}的天气信息显示`);
+            weatherContainer.outerHTML = `
+                <div class="weather-info">
+                    <h4>🌤️ 国庆期间天气</h4>
+                    <div class="weather-details">
+                        <div class="weather-item">
+                            <strong>天气状况</strong><br>
+                            ${weatherData.condition}
+                        </div>
+                        <div class="weather-item">
+                            <strong>温度</strong><br>
+                            ${weatherData.temperature}°C
+                        </div>
+                        <div class="weather-item">
+                            <strong>湿度</strong><br>
+                            ${weatherData.humidity}%
+                        </div>
+                        <div class="weather-item">
+                            <strong>风力</strong><br>
+                            ${weatherData.windSpeed} m/s
+                        </div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">
+                        ${weatherData.description}
+                    </p>
+                </div>
+            `;
+            console.log(`成功更新${city.name}的天气信息显示`);
         }
 
         // 显示天气错误信息
