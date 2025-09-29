@@ -29,15 +29,15 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 0;
             font-weight: 700;
         }
 
@@ -47,7 +47,8 @@
         }
 
         .control-panel {
-            display: none; /* 隐藏空的控制面板 */
+            display: none;
+            /* 隐藏空的控制面板 */
         }
 
         .control-panel .input-group {
@@ -148,16 +149,6 @@
             z-index: 1000;
         }
 
-        .btn-recommend {
-            flex: 3;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-recommend:hover {
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
         .btn-filter {
             flex: 1;
             background: linear-gradient(135deg, #28a745, #20c997);
@@ -169,6 +160,16 @@
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
 
+        .btn-recommend {
+            flex: 3;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-recommend:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
         .btn-icon {
             display: none;
         }
@@ -178,7 +179,7 @@
             .btn-filter .btn-text {
                 display: none;
             }
-            
+
             .btn-filter .btn-icon {
                 display: inline;
             }
@@ -601,16 +602,9 @@
 
         /* 选择困难按钮样式 */
         .choice-helper-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -10px 30px rgba(255, 154, 158, 0.3);
-            z-index: 100;
+            margin-top: 20px;
+            padding: 20px 0;
             backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -1068,7 +1062,6 @@
     <div class="container">
         <div class="header">
             <h1>🏛️ 中国旅游城市随机推荐</h1>
-            <p>发现100个值得探索的美丽城市，开启您的精彩旅程</p>
         </div>
 
         <div class="control-panel">
@@ -1079,24 +1072,24 @@
             <div class="no-results">
                 <h3>🎯 准备开始您的旅行计划</h3>
             </div>
-        </div>
-
-        <!-- 选择困难按钮 -->
-        <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
-            <button class="choice-helper-btn" onclick="openLotteryModal()">
-                🎲 选择困难点我
-            </button>
+            
+            <!-- 选择困难按钮 -->
+            <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
+                <button class="choice-helper-btn" onclick="openLotteryModal()">
+                    🎲 选择困难点我
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- 固定底部按钮区域 -->
     <div class="fixed-bottom-buttons">
-        <button class="btn btn-recommend" onclick="getRandomCities()">
-            <span class="btn-text">🎲 随机推荐</span>
-        </button>
         <button class="btn btn-filter" onclick="openFilterModal()">
             <span class="btn-text">⚙️ 筛选选项</span>
             <span class="btn-icon">⚙️</span>
+        </button>
+        <button class="btn btn-recommend" onclick="getRandomCities()">
+            <span class="btn-text">🎲 随机推荐</span>
         </button>
     </div>
 
