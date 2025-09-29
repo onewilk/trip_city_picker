@@ -1363,7 +1363,8 @@
             const selectedProvinces = getSelectedProvinces();
             const sameProvinceMode = document.querySelector('input[name="sameProvince"]:checked').value;
             const weatherToggle = document.getElementById('weatherToggle');
-            const showWeather = weatherToggle ? weatherToggle.checked : false;
+            // 如果天气开关元素不存在（筛选弹窗未打开），则默认显示天气信息
+            const showWeather = weatherToggle ? weatherToggle.checked : true;
             
             console.log('筛选条件获取结果:');
             console.log('- 选中省份:', selectedProvinces);
