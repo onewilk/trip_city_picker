@@ -14,31 +14,35 @@
 
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8f9fa;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
         }
 
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2em;
+            margin-bottom: 0;
             font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
@@ -47,9 +51,15 @@
         }
 
         .control-panel {
-            padding: 40px;
-            text-align: center;
-            background: #f8f9fa;
+            display: none;
+            /* 隐藏空的控制面板 */
+        }
+
+        .control-panel .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 0;
         }
 
         .input-group {
@@ -81,6 +91,12 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .input-suffix {
+            color: #6c757d;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
         .btn {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -99,6 +115,80 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-full {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            min-width: 120px;
+        }
+
+        .btn-filter:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        /* 固定底部按钮区域 */
+        .fixed-bottom-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .btn-filter {
+            flex: 1;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            position: relative;
+        }
+
+        .btn-filter:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-recommend {
+            flex: 3;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-recommend:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-icon {
+            display: none;
+        }
+
+        /* 响应式设计：小屏幕时隐藏筛选按钮文本 */
+        @media (max-width: 480px) {
+            .btn-filter .btn-text {
+                display: none;
+            }
+
+            .btn-filter .btn-icon {
+                display: inline;
+            }
+        }
+
         .btn:active {
             transform: translateY(0);
         }
@@ -110,13 +200,14 @@
         }
 
         .results {
-            padding: 40px;
+            padding: 0;
+            padding-bottom: 60px;
             min-height: 200px;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 20px 0;
             color: #666;
             font-size: 1.2em;
         }
@@ -145,18 +236,18 @@
 
         .city-card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid #667eea;
+            border-radius: 0;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 3px solid #667eea;
             transition: all 0.3s ease;
             animation: slideIn 0.5s ease-out;
         }
 
         .city-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         }
 
         @keyframes slideIn {
@@ -239,9 +330,9 @@
 
         .stats {
             background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 0;
+            margin-bottom: 20px;
             text-align: center;
         }
 
@@ -257,7 +348,7 @@
 
         .no-results {
             text-align: center;
-            padding: 60px 20px;
+            padding: 20px 0;
             color: #666;
         }
 
@@ -285,6 +376,19 @@
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .filter-row .filter-group {
+            flex: 1;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
         }
 
         .filter-group:last-child {
@@ -516,18 +620,10 @@
 
         /* 选择困难按钮样式 */
         .choice-helper-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
             text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -10px 30px rgba(255, 154, 158, 0.3);
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 20px 0;
         }
 
         .choice-helper-btn {
@@ -582,7 +678,7 @@
 
         /* 为页面内容添加底部间距，避免被固定按钮遮挡 */
         .container {
-            padding-bottom: 100px;
+            padding-bottom: 120px;
         }
 
         /* 弹窗样式 */
@@ -669,6 +765,14 @@
 
         .modal-body {
             padding: 30px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
         }
 
         /* 滚轮选择器样式 */
@@ -972,71 +1076,99 @@
 </head>
 
 <body>
+    <div class="header">
+        <h1>✈️ 中国旅游城市推荐</h1>
+    </div>
+
     <div class="container">
-        <div class="header">
-            <h1>🏛️ 中国旅游城市随机推荐</h1>
-            <p>发现100个值得探索的美丽城市，开启您的精彩旅程</p>
-        </div>
-
         <div class="control-panel">
-            <div class="input-group">
-                <label for="cityCount">选择城市数量：</label>
-                <input type="number" id="cityCount" min="1" max="100" value="5" required>
-                <button class="btn" onclick="getRandomCities()">🎲 随机推荐</button>
-            </div>
-
-            <div class="filter-section">
-                <h3>🎯 筛选选项</h3>
-
-                <div class="filter-group">
-                    <label class="filter-label">省份筛选：</label>
-                    <div class="province-filter">
-                        <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
-                        <div class="province-checkboxes" id="provinceCheckboxes">
-                            <!-- 省份复选框将通过JavaScript动态生成 -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">同省城市：</label>
-                    <div class="radio-group">
-                        <label class="radio-item">
-                            <input type="radio" name="sameProvince" value="allow" checked>
-                            <span>允许同省多个城市</span>
-                        </label>
-                        <label class="radio-item">
-                            <input type="radio" name="sameProvince" value="prevent">
-                            <span>避免同省多个城市</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">天气信息：</label>
-                    <div class="switch-container">
-                        <label class="switch">
-                            <input type="checkbox" id="weatherToggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span class="switch-label">显示国庆期间天气</span>
-                    </div>
-                </div>
-            </div>
+            <!-- 控制面板内容已移到筛选弹窗中 -->
         </div>
 
         <div class="results" id="results">
             <div class="no-results">
                 <h3>🎯 准备开始您的旅行计划</h3>
-                <p>选择您想要的城市数量，点击"随机推荐"按钮开始探索</p>
+            </div>
+
+            <!-- 选择困难按钮 -->
+            <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
+                <button class="choice-helper-btn" onclick="openLotteryModal()">
+                    🎲 选择困难点我
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- 选择困难按钮 -->
-        <div class="choice-helper-container" id="choiceHelperContainer" style="display: none;">
-            <button class="choice-helper-btn" onclick="openLotteryModal()">
-                🎲 选择困难点我
-            </button>
+    <!-- 固定底部按钮区域 -->
+    <div class="fixed-bottom-buttons">
+        <button class="btn btn-filter" onclick="openFilterModal()">
+            <span class="btn-text">⚙️ 筛选</span>
+            <span class="btn-icon">⚙️</span>
+        </button>
+        <button class="btn btn-recommend" onclick="getRandomCities()">
+            <span class="btn-text">🎲 随机推荐</span>
+        </button>
+    </div>
+
+    <!-- 筛选选项弹窗 -->
+    <div class="modal-overlay" id="filterModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎯 筛选</h2>
+                <button class="close-btn" onclick="closeFilterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">城市数量：</label>
+                            <div class="input-group">
+                                <input type="number" id="cityCount" min="1" max="100" value="5" required>
+                                <span class="input-suffix">个城市</span>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label">天气信息：</label>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="weatherToggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">显示国庆期间天气</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">同省城市：</label>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="sameProvince" value="allow" checked>
+                                <span>允许同省多个城市</span>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="sameProvince" value="prevent">
+                                <span>避免同省多个城市</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">省份筛选：</label>
+                        <div class="province-filter">
+                            <button type="button" class="filter-btn" onclick="toggleAllProvinces()">全选/全不选</button>
+                            <div class="province-checkboxes" id="provinceCheckboxes">
+                                <!-- 省份复选框将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeFilterModal()">取消</button>
+                <button class="btn" onclick="applyFilters()">应用筛选</button>
+            </div>
         </div>
     </div>
 
@@ -1078,6 +1210,8 @@
         let allProvinces = [];
         let currentRecommendedCities = [];
         let isWheelSpinning = false;
+        let dataLoaded = false;
+        let pendingRecommendation = false;
 
         // API配置
         const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -1085,52 +1219,55 @@
             : 'https://web-production-9cc1d.up.railway.app'; // 请替换为您的实际Railway URL
 
         // 加载省份数据
-        async function loadProvincesData() {
+
+        // 优化后的数据加载逻辑
+        async function loadCitiesData() {
             try {
-                const response = await fetch('provinces_data.json');
-                allProvinces = await response.json();
-                console.log(`已加载 ${allProvinces.length} 个省份数据`);
+                // 加载城市数据
+                citiesData = await loadCitiesDataFromSource();
+                console.log(`已加载 ${citiesData.length} 个城市数据`);
+
+                // 从城市数据中提取省份
+                allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
+                console.log(`从城市数据中提取了 ${allProvinces.length} 个省份`);
                 generateProvinceCheckboxes();
-            } catch (error) {
-                console.error('加载省份数据失败:', error);
-                // 如果省份文件不存在，回退到从城市数据中提取
-                console.log('回退到从城市数据中提取省份...');
-                if (citiesData.length > 0) {
-                    allProvinces = [...new Set(citiesData.map(city => city.province))].sort();
-                    generateProvinceCheckboxes();
+
+                // 标记数据加载完成
+                dataLoaded = true;
+
+                // 如果有待处理的推荐请求，自动触发
+                if (pendingRecommendation) {
+                    pendingRecommendation = false;
+                    hideLoading();
+                    getRandomCities();
                 }
+
+            } catch (error) {
+                console.error('数据加载失败:', error);
+                showError('数据加载失败，请刷新页面重试');
+                pendingRecommendation = false;
             }
         }
 
-        // 加载城市数据
-        async function loadCitiesData() {
+        // 从各种源加载城市数据
+        async function loadCitiesDataFromSource() {
+            // 优先尝试从后端API获取数据
             try {
-                // 优先尝试从后端API获取数据
-                try {
-                    const response = await fetch(`${API_BASE_URL}/api/random-cities?count=1000`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        citiesData = data.cities || data;
-                        console.log(`已从后端API加载 ${citiesData.length} 个城市数据`);
-                        // 加载省份数据
-                        await loadProvincesData();
-                        return;
-                    }
-                } catch (apiError) {
-                    console.log('后端API不可用，使用本地数据:', apiError);
+                const response = await fetch(`${API_BASE_URL}/api/random-cities?count=1000`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('从后端API加载城市数据');
+                    return data.cities || data;
                 }
-                
-                // 如果API不可用，回退到本地文件
-                const response = await fetch('cities_data.json');
-                citiesData = await response.json();
-                console.log(`已从本地文件加载 ${citiesData.length} 个城市数据`);
-
-                // 加载省份数据
-                await loadProvincesData();
-            } catch (error) {
-                console.error('加载城市数据失败:', error);
-                showError('加载城市数据失败，请刷新页面重试');
+            } catch (apiError) {
+                console.log('后端API不可用，使用本地数据:', apiError);
             }
+
+            // 如果API不可用，回退到本地文件
+            const response = await fetch('cities_data.json');
+            const data = await response.json();
+            console.log('从本地文件加载城市数据');
+            return data;
         }
 
         // 生成省份复选框
@@ -1188,9 +1325,17 @@
         }
 
         // 显示加载状态
-        function showLoading() {
+        function showLoading(message = '正在为您推荐城市...') {
             const results = document.getElementById('results');
-            results.innerHTML = '<div class="loading">正在为您推荐城市...</div>';
+            results.innerHTML = `<div class="loading">${message}</div>`;
+        }
+
+        function hideLoading() {
+            const results = document.getElementById('results');
+            const loading = results.querySelector('.loading');
+            if (loading) {
+                loading.remove();
+            }
         }
 
         // 随机获取城市
@@ -1199,6 +1344,13 @@
 
             if (!cityCount || cityCount < 1 || cityCount > 100) {
                 alert('请输入1-100之间的数字');
+                return;
+            }
+
+            // 如果数据还没有加载完成，显示加载提示并等待
+            if (!dataLoaded) {
+                showLoading('正在加载城市数据，请稍候...');
+                pendingRecommendation = true;
                 return;
             }
 
@@ -1353,14 +1505,21 @@
                 `;
             });
 
+            // 添加选择困难按钮（当推荐城市数量大于1时）
+            if (cities.length > 1) {
+                html += `
+                    <div class="choice-helper-container">
+                        <button class="choice-helper-btn" onclick="openLotteryModal()">
+                            🎲 选择困难点我
+                        </button>
+                    </div>
+                `;
+            }
+
             results.innerHTML = html;
 
-            // 显示选择困难按钮（当推荐城市数量大于1时）
-            if (cities.length > 1) {
-                choiceHelperContainer.style.display = 'block';
-            } else {
-                choiceHelperContainer.style.display = 'none';
-            }
+            // 隐藏外部的选择困难按钮容器
+            choiceHelperContainer.style.display = 'none';
 
             // 如果需要显示天气信息，异步获取
             if (showWeather) {
@@ -1473,6 +1632,26 @@
 
             // 显示弹窗
             modal.style.display = 'flex';
+        }
+
+        // 打开筛选选项弹窗
+        function openFilterModal() {
+            const modal = document.getElementById('filterModal');
+            modal.style.display = 'flex';
+        }
+
+        // 关闭筛选选项弹窗
+        function closeFilterModal() {
+            const modal = document.getElementById('filterModal');
+            modal.style.display = 'none';
+        }
+
+        // 应用筛选选项
+        function applyFilters() {
+            closeFilterModal();
+            // 获取城市数量
+            const cityCount = document.getElementById('cityCount').value;
+            console.log('筛选选项已应用，城市数量：', cityCount);
         }
 
         // 关闭滚轮抽奖弹窗
@@ -1623,9 +1802,15 @@
 
         // 点击弹窗外部关闭
         document.addEventListener('click', function (e) {
-            const modal = document.getElementById('lotteryModal');
-            if (e.target === modal) {
+            const lotteryModal = document.getElementById('lotteryModal');
+            const filterModal = document.getElementById('filterModal');
+
+            if (e.target === lotteryModal) {
                 closeLotteryModal();
+            }
+
+            if (e.target === filterModal) {
+                closeFilterModal();
             }
         });
 
@@ -1633,6 +1818,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeLotteryModal();
+                closeFilterModal();
             }
         });
 
